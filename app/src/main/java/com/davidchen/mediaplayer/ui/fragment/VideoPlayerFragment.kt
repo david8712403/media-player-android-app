@@ -136,7 +136,6 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun scrollToPosition(recyclerView: RecyclerView, position: Int) {
-        val deselectColor = requireContext().getColor(android.R.color.transparent)
         activity?.runOnUiThread {
             recyclerView.smoothScrollToPosition(position)
             adapter.selectItem(position)

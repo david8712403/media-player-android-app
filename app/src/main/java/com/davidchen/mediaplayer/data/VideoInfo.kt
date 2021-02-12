@@ -9,7 +9,21 @@ class VideoInfo : Serializable {
     lateinit var captionResult: CaptionResult
 
     fun getVideoId(): String {
-        return videourl.substring(videourl.length - 11, videourl.length)
+        val str = videourl.split("v=")
+        var id = ""
+        id = if (str.size > 1) {
+            str[1]
+        }else {
+            str[0]
+        }
+        val ampersandPosition = id.indexOf('&')
+        if (ampersandPosition != -1) {
+            id = id.substring(0, ampersandPosition)
+        }
+        if (id.length > 11) {
+            id = id.substring(id.length - 11, id.length)
+        }
+        return id
     }
 
     class CaptionResult : Serializable {
