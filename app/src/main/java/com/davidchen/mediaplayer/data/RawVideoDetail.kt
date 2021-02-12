@@ -1,9 +1,11 @@
 package com.davidchen.mediaplayer.data
 
-class RawVideoDetail {
+import java.io.Serializable
+
+class RawVideoDetail : Serializable {
     lateinit var result: Result
 
-    class Result {
+    class Result : Serializable {
         lateinit var videoInfo: VideoInfo
     }
 }

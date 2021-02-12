@@ -1,9 +1,10 @@
-package com.davidchen.mediaplayer
+package com.davidchen.mediaplayer.util
 
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
+import com.davidchen.mediaplayer.R
 
 class ProgressDialogUtil {
     companion object {

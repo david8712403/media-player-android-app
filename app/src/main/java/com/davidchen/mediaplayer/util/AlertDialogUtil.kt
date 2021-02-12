@@ -1,4 +1,4 @@
-package com.davidchen.mediaplayer
+package com.davidchen.mediaplayer.util
 
 import android.R.string.ok
 import android.app.AlertDialog
