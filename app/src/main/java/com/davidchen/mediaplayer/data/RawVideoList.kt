@@ -23,6 +23,11 @@ class RawVideoList : Serializable {
                 val thumbnails: String = ""
                 val description: String = ""
                 val duration: String = ""
+                val publishedAt: String = ""
+
+                fun getPublishTime(): String {
+                    return publishedAt.split("T")[0]
+                }
 
                 fun getVideoId(): String {
                     val str = videourl.split("v=")

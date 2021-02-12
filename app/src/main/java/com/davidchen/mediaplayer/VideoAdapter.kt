@@ -28,6 +28,7 @@ class VideoAdapter(private val videos: Array<RawVideoList.Result.Video>):
         val tvDuration = v.findViewById<TextView>(R.id.tv_duration)
         val tvCollection = v.findViewById<TextView>(R.id.tv_collection)
         val tvViewer = v.findViewById<TextView>(R.id.tv_viewer)
+        val tvPublishedAt = v.findViewById<TextView>(R.id.tv_published_at)
         val pg_loading = v.findViewById<ProgressBar>(R.id.pb_image)
     }
 
@@ -78,6 +79,7 @@ class VideoAdapter(private val videos: Array<RawVideoList.Result.Video>):
         holder.tvCollection.text = "${video.collection}${context.getString(R.string.collection_num)}"
         holder.tvViewer.text = "${video.viewer}${context.getString(R.string.viewer_num)}"
         holder.tvDuration.text = video.videoInfo.duration
+        holder.tvPublishedAt.text = video.videoInfo.getPublishTime()
 
         holder.itemView.setOnClickListener {
             callback?.onClick(video.videoID)

@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">MediaPlayer</string>
     <string name="loading">Loading</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="collection_num">人收藏</string>
     <string name="viewer_num">人看過</string>
+    <string name="search_video">搜尋影片</string>
 </resources>
