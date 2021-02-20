@@ -13,7 +13,6 @@ class CaptionAdapter(private val caption: Array<VideoInfo.CaptionResult.Result.C
 
     lateinit var v: View
     private var selectPosition: Int? = null
-    var items = ArrayList<View>()
     var callback: Callback? = null
 
     class ViewHolder(v: View): RecyclerView.ViewHolder(v) {
@@ -30,7 +29,6 @@ class CaptionAdapter(private val caption: Array<VideoInfo.CaptionResult.Result.C
         val context = holder.itemView.context
         val selectColor = context.getColor(android.R.color.darker_gray)
         val deselectColor = context.getColor(android.R.color.transparent)
-        items.add(holder.itemView)
         holder.tvCaption.text = caption[position].content
         holder.tvCaptionNum.text = position.plus(1).toString()
         if (position == selectPosition) {

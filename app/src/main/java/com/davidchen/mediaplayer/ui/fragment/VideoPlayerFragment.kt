@@ -37,7 +37,7 @@ private const val VIDEO_ID = "videoId"
  */
 class VideoPlayerFragment : Fragment() {
     lateinit var caption: Array<VideoInfo.CaptionResult.Result.Caption>
-
+    lateinit var captionMap: MutableMap<Int, VideoInfo.CaptionResult.Result.Caption>
     lateinit var videoId: String
     lateinit var v: FragmentVideoPlayerBinding
     lateinit var adapter: CaptionAdapter
@@ -73,12 +73,11 @@ class VideoPlayerFragment : Fragment() {
             override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
                 if (curTime != second.roundToInt()) {
                     curTime = second.roundToInt()
-                    for (c in caption) {
-                        if (c.time == second.roundToInt()) {
-                            val position = caption.indexOf(c)
+                    val c: VideoInfo.CaptionResult.Result.Caption? = captionMap[curTime]
+                    if (c != null) {
+                        val position = caption.indexOf(c)
 //                            Timber.d("scroll to $position")
-                            scrollToPosition(v.rvCaption, position)
-                        }
+                        scrollToPosition(v.rvCaption, position)
                     }
                 }
             }
@@ -181,6 +180,10 @@ class VideoPlayerFragment : Fragment() {
                             .captionResult
                             .results[0]
                             .captions
+                    captionMap = mutableMapOf()
+                    for (c in caption) {
+                        captionMap[c.time] = c
+                    }
                     activity?.runOnUiThread {
                         adapter = CaptionAdapter(caption)
                         v.rvCaption.adapter = adapter
