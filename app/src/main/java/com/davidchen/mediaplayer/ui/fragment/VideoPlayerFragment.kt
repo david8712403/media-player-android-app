@@ -5,17 +5,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.iterator
+import android.widget.SeekBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.davidchen.mediaplayer.BuildConfig.italkutalk_guest_key
 import com.davidchen.mediaplayer.CaptionAdapter
+import com.davidchen.mediaplayer.MainActivity
 import com.davidchen.mediaplayer.R
 import com.davidchen.mediaplayer.data.RawVideoDetail
 import com.davidchen.mediaplayer.data.VideoInfo
 import com.davidchen.mediaplayer.databinding.FragmentVideoPlayerBinding
 import com.davidchen.mediaplayer.util.AlertDialogUtil
-import com.davidchen.mediaplayer.util.ProgressDialogUtil
+import com.davidchen.mediaplayer.util.MyProgressDialog
 import com.google.gson.Gson
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -65,12 +66,18 @@ class VideoPlayerFragment : Fragment() {
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         v.rvCaption.layoutManager = linearLayoutManager
         lifecycle.addObserver(v.youtubeView)
+
         v.youtubeView.addYouTubePlayerListener(object : YouTubePlayerListener {
             override fun onApiChange(youTubePlayer: YouTubePlayer) {
 
             }
 
             override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                val min = second.div(60).roundToInt()
+                val sec = second.rem(60).roundToInt()
+                v.youtubeSeekbar.videoCurrentTimeTextView.text = String.format("%d:%02d", min, sec)
+                v.youtubeSeekbar.seekBar.progress = second.roundToInt()
+
                 if (curTime != second.roundToInt()) {
                     curTime = second.roundToInt()
                     val c: VideoInfo.CaptionResult.Result.Caption? = captionMap[curTime]
@@ -104,6 +111,8 @@ class VideoPlayerFragment : Fragment() {
                 Timber.d("ready")
                 sendVideoDetailRequest()
                 mYouTubePlayer = youTubePlayer
+                v.youtubeView.getPlayerUiController().showSeekBar(false)
+                v.youtubeSeekbar.showBufferingProgress = true
             }
 
             override fun onStateChange(
@@ -114,7 +123,34 @@ class VideoPlayerFragment : Fragment() {
             }
 
             override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
-                Timber.d("duration: $duration")
+                v.youtubeSeekbar.seekBar.max = duration.roundToInt()
+                val min = duration.div(60).roundToInt()
+                val sec = duration.rem(60).roundToInt()
+                v.youtubeSeekbar.videoDurationTextView.text = String.format("%d:%02d", min, sec)
+
+                v.youtubeSeekbar.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                        if (curTime != progress) {
+                            curTime = progress
+                            val c: VideoInfo.CaptionResult.Result.Caption? = captionMap[curTime]
+                            if (c != null) {
+                                val position = caption.indexOf(c)
+//                            Timber.d("scroll to $position")
+                                scrollToPosition(v.rvCaption, position)
+                            }
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                        mYouTubePlayer.pause()
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                        seekBar?.progress?.toFloat()?.let { mYouTubePlayer.seekTo(it) }
+                        mYouTubePlayer.play()
+                    }
+
+                })
             }
 
             override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
@@ -128,8 +164,6 @@ class VideoPlayerFragment : Fragment() {
             }
 
         })
-
-        ProgressDialogUtil.showProgressDialog(requireContext(), "loading...")
 
         return v.root
     }
@@ -167,8 +201,11 @@ class VideoPlayerFragment : Fragment() {
                 .post(body)
                 .build()
 
+        (activity as MainActivity).mProgressDialog.show("loading...")
+
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                (activity as MainActivity).mProgressDialog.dismiss()
                 AlertDialogUtil.showAlertDialog(requireContext(), e.message.toString())
             }
 
@@ -198,7 +235,7 @@ class VideoPlayerFragment : Fragment() {
                         mYouTubePlayer.loadVideo(videoInfo.getVideoId(), 0f)
                     }
                 }
-                ProgressDialogUtil.dismiss()
+                (activity as MainActivity).mProgressDialog.dismiss()
             }
 
         })

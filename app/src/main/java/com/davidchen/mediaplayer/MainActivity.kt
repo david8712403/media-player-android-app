@@ -4,13 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.davidchen.mediaplayer.databinding.ActivityMainBinding
 import com.davidchen.mediaplayer.ui.fragment.VideoListFragment
-import com.davidchen.mediaplayer.util.ProgressDialogUtil
+import com.davidchen.mediaplayer.util.MyProgressDialog
 import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var v: ActivityMainBinding
+    lateinit var mProgressDialog: MyProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,15 +24,16 @@ class MainActivity : AppCompatActivity() {
             .add(R.id.root, f)
             .show(f)
             .commit()
+        mProgressDialog = MyProgressDialog(this)
     }
 
     override fun onBackPressed() {
+//        super.onBackPressed()
+
         if (supportFragmentManager.backStackEntryCount == 0 ) {
             finish()
-            if (ProgressDialogUtil.mAlertDialog?.isShowing == false) {
-                ProgressDialogUtil.mAlertDialog = null
-            }
         }else {
+            mProgressDialog.dismiss()
             supportFragmentManager.popBackStack()
         }
     }

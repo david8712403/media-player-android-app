@@ -1,5 +1,6 @@
 package com.davidchen.mediaplayer.ui.fragment
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
@@ -13,12 +14,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.davidchen.mediaplayer.BuildConfig
+import com.davidchen.mediaplayer.MainActivity
 import com.davidchen.mediaplayer.R
 import com.davidchen.mediaplayer.VideoAdapter
 import com.davidchen.mediaplayer.data.RawVideoList
 import com.davidchen.mediaplayer.databinding.FragmentVideoListBinding
 import com.davidchen.mediaplayer.util.AlertDialogUtil
-import com.davidchen.mediaplayer.util.ProgressDialogUtil
+import com.davidchen.mediaplayer.util.MyProgressDialog
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -97,7 +99,7 @@ class VideoListFragment : Fragment() {
     }
 
     private fun sendVideoListRequest() {
-        ProgressDialogUtil.showProgressDialog(requireContext(), "loading videos...")
+        (activity as MainActivity).mProgressDialog.show("loading videos...")
         val guestKey = BuildConfig.italkutalk_guest_key
 
         val httpUrl = HttpUrl.Builder()
@@ -121,6 +123,7 @@ class VideoListFragment : Fragment() {
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                (activity as MainActivity).mProgressDialog.dismiss()
                 AlertDialogUtil.showAlertDialog(requireContext(), e.message.toString())
             }
 
@@ -141,7 +144,7 @@ class VideoListFragment : Fragment() {
                         v.rvVideo.adapter = adapter
                     }
                 }
-                ProgressDialogUtil.dismiss()
+                (activity as MainActivity).mProgressDialog.dismiss()
             }
 
         })
